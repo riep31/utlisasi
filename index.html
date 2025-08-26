@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Login</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to right, #4facfe, #00f2fe);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .login-box {
+      width: 320px;
+      background: #fff;
+      padding: 25px;
+      border-radius: 15px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+      text-align: center;
+      animation: fadeIn 0.8s ease-in-out;
+    }
+    .login-box h2 {
+      margin-bottom: 20px;
+      color: #333;
+    }
+    .login-box input {
+      width: 90%;
+      padding: 10px;
+      margin: 8px 0;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+    }
+    .login-box button {
+      width: 95%;
+      padding: 10px;
+      margin-top: 12px;
+      background: #4facfe;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    .login-box button:hover {
+      background: #00c6ff;
+    }
+    #msg { color: red; margin-top: 10px; font-size: 14px; }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+  <div class="login-box">
+    <h2>Silahkan Login</h2>
+    <input type="text" id="username" placeholder="Username">
+    <input type="password" id="password" placeholder="Password">
+    <button onclick="login()">Masuk</button>
+    <p id="msg"></p>
+  </div>
+
+  <script>
+    const apiKey = "AIzaSyD3nhZyvd7npQw6n9mPXxOA6svJdo_JQis"; // ganti dengan API Key Google Sheets kamu
+    const sheetId = "1AwPzVONLkr-GXigtHBGPPXE8XwZdwPXw69g7XSp5FdY";
+    const sheetName = "PEGAWAI";
+    let users = [];
+
+    // Ambil data user dari GSheet
+    async function loadUsers() {
+      const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${sheetName}?key=${apiKey}`;
+      const res = await fetch(url);
+      const data = await res.json();
+      const rows = data.values;
+
+      // buang header
+      users = rows.slice(1).map(r => ({
+        username: r[0],
+        password: r[1],
+        nama: r[2],
+        level: r[3],
+        divisi: r[4]
+      }));
+    }
+
+    loadUsers();
+
+    async function login() {
+      const u = document.getElementById("username").value.trim();
+      const p = document.getElementById("password").value.trim();
+
+      const user = users.find(x => x.username === u && x.password === p);
+      if (user) {
+        // simpan data user ke localStorage
+        localStorage.setItem("user", JSON.stringify(user));
+        window.location.href = "dashboard.html";
+      } else {
+        document.getElementById("msg").innerText = "❌ Username atau Password salah!";
+      }
+    }
+  </script>
+</body>
+</html>
